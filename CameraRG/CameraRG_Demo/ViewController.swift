@@ -44,7 +44,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     /*
-     FIXME: 在这里 insertCameraLayer() 的好处?
+     FIXME: 在这里 insertCameraLayer() 的好处, 可解决旋屏后 CameraLayer 重绘
      1、init初始化不会触发layoutSubviews
      2、addSubview会触发layoutSubviews
      3、设置view的Frame会触发layoutSubviews，当然前提是frame的值设置前后发生了变化
@@ -54,7 +54,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
      */
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        //insertCameraLayer()
+        insertCameraLayer()
     }
     
     func insertCameraLayer() {
@@ -66,7 +66,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         self.cameraEngine.rotationCamera = true
-        insertCameraLayer()
     }
     
     @IBAction func setModeCapture(_ sender: AnyObject) {

@@ -101,7 +101,7 @@ public class CameraEngine: NSObject {
     var captureDeviceIntput: AVCaptureDeviceInput?
     let cameraOutput = CameraEngineCaptureOutput.sharedInstance
 
-    var sessionQueue: DispatchQueue = DispatchQueue(label: cameraEngineSessionQueueIdentifier)
+    var sessionQueue = DispatchQueue(label: cameraEngineSessionQueueIdentifier)
 
     private var _torchMode: AVCaptureTorchMode = .off
     public var torchMode: AVCaptureTorchMode! {
@@ -409,7 +409,15 @@ public class CameraEngine: NSObject {
         }
     }
 
-    public func switchCurrentDevice() {} //子类重写
+    public func switchCurrentDevice() -> Bool{
+        if isRecording == false {
+            changeCurrentDevice((cameraDevice.currentPosition == .back) ? .front : .back)
+        }
+        if cameraDevice.currentPosition == .back {
+            return true
+        }
+        return false
+    }
 
     //MARK: Device I/O configuration
 
@@ -496,7 +504,6 @@ protocol CameraEngineProtocal {
     func startRecordingVideo(_ url: URL, blockCompletion: @escaping blockCompletionCaptureVideo)
     func stopRecordingVideo()
     func configureOutputDevice()
-    func switchCurrentDevice()
     func configureFlash(_ mode: AVCaptureFlashMode)
 }
 

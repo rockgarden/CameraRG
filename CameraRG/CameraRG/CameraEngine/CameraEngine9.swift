@@ -26,13 +26,6 @@ public class CameraEngine9: CameraEngine {
         }
     }
     
-    public override func switchCurrentDevice() {
-        if isRecording == false {
-            changeCurrentDevice((cameraDevice.currentPosition == .back) ? .front : .back)
-        }
-    }
-
-    
     //MARK: - Device I/O configuration
     
     public override func configureOutputDevice() {
