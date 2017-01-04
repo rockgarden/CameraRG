@@ -22,7 +22,7 @@ public class ConfirmViewController: UIViewController, UIScrollViewDelegate {
     var verticalPadding: CGFloat = 30
     var horizontalPadding: CGFloat = 30
     
-    public var onComplete: CameraViewCompletion?
+    public var onComplete: CameraCompletion?
     
     var asset: PHAsset!
     

@@ -243,6 +243,17 @@ public class CameraEngine: NSObject {
         }
     }
 
+    private var _whiteBalanceMode: AVCaptureWhiteBalanceMode = .autoWhiteBalance
+    public var whiteBalanceMode: AVCaptureWhiteBalanceMode! {
+        get {
+            return _whiteBalanceMode
+        }
+        set {
+            _whiteBalanceMode = newValue
+            configureWhiteBalanceMode(newValue)
+        }
+    }
+
     public var isAdjustingWhiteBalance: Bool {
         get {
             if let `captureDevice` = captureDevice {
@@ -338,6 +349,9 @@ public class CameraEngine: NSObject {
 
     //MARK: - Device management
 
+    /**
+     * Observer the device orientation to update the orientation of previewLayer.
+     */
     private func handleDeviceOrientation() {
         if self.rotationCamera {
             if (!UIDevice.current.isGeneratingDeviceOrientationNotifications) {
@@ -346,8 +360,7 @@ public class CameraEngine: NSObject {
             NotificationCenter.default.addObserver(forName: NSNotification.Name.UIDeviceOrientationDidChange, object: nil, queue: OperationQueue.main) { (_) -> Void in
                 self.previewLayer.connection.videoOrientation = AVCaptureVideoOrientation.orientationFromUIDeviceOrientation(UIDevice.current.orientation)
             }
-        }
-        else {
+        } else {
             if (UIDevice.current.isGeneratingDeviceOrientationNotifications) {
                 UIDevice.current.endGeneratingDeviceOrientationNotifications()
             }
@@ -390,6 +403,19 @@ public class CameraEngine: NSObject {
             do {
                 try currentDevice.lockForConfiguration()
                 currentDevice.torchMode = mode
+                currentDevice.unlockForConfiguration()
+            }
+            catch {
+                fatalError("[CameraEngine] error lock configuration device")
+            }
+        }
+    }
+
+    private func configureWhiteBalanceMode(_ mode: AVCaptureWhiteBalanceMode) {
+        if let currentDevice = self.cameraDevice.currentDevice, currentDevice.isWhiteBalanceModeSupported(mode) && currentDevice.whiteBalanceMode != mode {
+            do {
+                try currentDevice.lockForConfiguration()
+                currentDevice.whiteBalanceMode = mode
                 currentDevice.unlockForConfiguration()
             }
             catch {

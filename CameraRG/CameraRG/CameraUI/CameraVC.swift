@@ -11,7 +11,7 @@ import AVFoundation
 import Photos
 
 public extension CameraVC {
-    public class func imagePickerViewController(croppingEnabled: Bool, completion: @escaping CameraViewCompletion) -> UINavigationController {
+    public class func imagePickerViewController(croppingEnabled: Bool, completion: @escaping CameraCompletion) -> UINavigationController {
         let imagePicker = PhotoLibraryViewController()
         let navigationController = UINavigationController(rootViewController: imagePicker)
         
@@ -41,7 +41,7 @@ public extension CameraVC {
 }
 
 
-public typealias CameraViewCompletion = (UIImage?, PHAsset?) -> Void
+public typealias CameraCompletion = (UIImage?, PHAsset?) -> Void
 
 public class CameraVC: UIViewController {
     
@@ -50,7 +50,7 @@ public class CameraVC: UIViewController {
     var animationRunning = false
     
     var lastInterfaceOrientation : UIInterfaceOrientation?
-    var onCompletion: CameraViewCompletion?
+    var onCompletion: CameraCompletion?
     var volumeControl: VolumeControl?
     
     var animationDuration: TimeInterval = 0.5
@@ -156,7 +156,7 @@ public class CameraVC: UIViewController {
         return view
     }()
     
-    public init(croppingEnabled: Bool, allowsLibraryAccess: Bool = true, completion: @escaping CameraViewCompletion) {
+    public init(croppingEnabled: Bool, allowsLibraryAccess: Bool = true, completion: @escaping CameraCompletion) {
         super.init(nibName: nil, bundle: nil)
         onCompletion = completion
         allowCropping = croppingEnabled
@@ -208,7 +208,7 @@ public class CameraVC: UIViewController {
      * device is rotating, based on the device orientation.
      */
     override public func updateViewConstraints() {
-        
+
         if !didUpdateViews {
             configCameraViewConstraints()
             didUpdateViews = true
@@ -275,12 +275,11 @@ public class CameraVC: UIViewController {
      */
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        cameraView.startSession()
+        cameraView.cameraEngine.startSession()
     }
     
     /**
-     * Enable the button to take the picture when the
-     * camera is ready.
+     * Enable the button to take the picture when the camera is ready.
      */
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -321,15 +320,15 @@ public class CameraVC: UIViewController {
     }
     
     /**
-     * Observer the device orientation to update the
-     * orientation of CameraView.
+     * Observer the device orientation to update the orientation of CameraView.
      */
     private func addRotateObserver() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(rotateCameraView),
-            name: NSNotification.Name.UIDeviceOrientationDidChange,
-            object: nil)
+        cameraView.cameraEngine.rotationCamera = true
+//        NotificationCenter.default.addObserver(
+//            self,
+//            selector: #selector(rotateCameraView),
+//            name: NSNotification.Name.UIDeviceOrientationDidChange,
+//            object: nil)
     }
     
     internal func notifyCameraReady() {
@@ -461,28 +460,53 @@ public class CameraVC: UIViewController {
     }
     
     /**
-     * This method will be called when the user
-     * try to take the picture.
-     * It will lock any button while the shot is
-     * taken, then, realease the buttons and save
-     * the picture on the device.
+     * This method will be called when the user try to take the picture.
+     * It will lock any button while the shot is taken, then, realease the buttons and save the picture on the device.
      */
     internal func capturePhoto() {
-        guard let output = cameraView.imageOutput,
-            let connection = output.connection(withMediaType: AVMediaTypeVideo) else {
-                return
+
+        toggleButtons(enabled: false)
+
+        func alartLocal(t: String) {
+            let alertController =  UIAlertController(title: t, message: nil, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+            self.present(alertController, animated: true, completion: nil)
         }
-        
-        if connection.isEnabled {
-            toggleButtons(enabled: false)
-            cameraView.capturePhoto { image in
-                guard let image = image else {
-                    self.toggleButtons(enabled: true)
-                    return
+
+        switch cameraView.mode {
+        case .Photo:
+            cameraView.cameraEngine.capturePhoto { (image , error) -> (Void) in
+                if let image = image {
+                    CameraEngineFileManager.savePhoto(image) {(success, error) -> (Void) in
+                        if success {
+                            alartLocal(t: "Success, image saved !")
+                        }
+                    }
                 }
-                self.saveImage(image: image)
+            }
+        case .Video:
+            if !cameraView.cameraEngine.isRecording {
+                if let url = CameraEngineFileManager.temporaryPath("video.mp4") {
+                    cameraButton.setTitle("stop", for: .normal)
+                    cameraView.cameraEngine.startRecordingVideo(url) {(url, error) -> (Void) in
+                        if let url = url {
+                            DispatchQueue.main.async {
+                                self.cameraButton.setTitle("start", for: .normal)
+                                CameraEngineFileManager.saveVideo(url) {(success, error) -> (Void) in
+                                    if success {
+                                        alartLocal(t: "Success, video saved !")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                cameraView.cameraEngine.stopRecordingVideo()
             }
         }
+
+        toggleButtons(enabled: true)
     }
     
     internal func saveImage(image: UIImage) {
@@ -518,16 +542,10 @@ public class CameraVC: UIViewController {
     }
     
     internal func toggleFlash() {
-        cameraView.cycleFlash()
-        
-        guard let device = cameraView.device else {
-            return
-        }
-        
-        let image = UIImage(named: flashImage(device.flashMode),
+        let fM = cameraView.cycleFlash()
+        let image = UIImage(named: flashImage(fM),
                             in: Bundle(for: CameraVC.self),
                             compatibleWith: nil)
-        
         flashButton.setImage(image, for: .normal)
     }
     
@@ -537,7 +555,7 @@ public class CameraVC: UIViewController {
     }
     
     internal func layoutCameraResult(asset: PHAsset) {
-        cameraView.stopSession()
+        cameraView.cameraEngine.stopSession()
         startConfirmController(asset: asset)
         toggleButtons(enabled: true)
     }

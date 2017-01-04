@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="IMP-B6-CcH">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="IMP-B6-CcH">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -12,7 +12,7 @@
         <!--View Controller-->
         <scene sceneID="Df5-ye-ZkI">
             <objects>
-                <viewController id="IMP-B6-CcH" customClass="ViewController" customModule="CameraEngineExample" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="IMP-B6-CcH" customClass="ViewController" customModule="CameraRG_Demo" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="nrj-V8-wCj"/>
                         <viewControllerLayoutGuide type="bottom" id="ziY-Zq-PdQ"/>
@@ -84,6 +84,13 @@
                                     <action selector="switchCamera:" destination="IMP-B6-CcH" eventType="touchUpInside" id="ZiC-n4-2Li"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uxL-SW-jpP">
+                                <rect key="frame" x="145" y="60" width="84" height="30"/>
+                                <state key="normal" title="new camera"/>
+                                <connections>
+                                    <action selector="openCamera:" destination="IMP-B6-CcH" eventType="touchUpInside" id="rda-ta-n7N"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -98,8 +105,10 @@
                             <constraint firstItem="PsS-Bq-SVH" firstAttribute="top" secondItem="nrj-V8-wCj" secondAttribute="bottom" id="HZX-Dc-HtD"/>
                             <constraint firstAttribute="trailing" secondItem="fUb-s8-CkO" secondAttribute="trailing" id="JYS-Oe-3yd"/>
                             <constraint firstItem="ziY-Zq-PdQ" firstAttribute="top" secondItem="t4H-ft-ZcI" secondAttribute="bottom" id="Tq0-BU-4wl"/>
+                            <constraint firstItem="uxL-SW-jpP" firstAttribute="centerX" secondItem="mam-mN-bGz" secondAttribute="centerX" id="VYL-PE-TpY"/>
                             <constraint firstItem="bwJ-AS-rMY" firstAttribute="leading" secondItem="mam-mN-bGz" secondAttribute="leadingMargin" id="aP6-b5-eHV"/>
                             <constraint firstItem="2ha-0j-OTF" firstAttribute="centerX" secondItem="mam-mN-bGz" secondAttribute="centerX" id="bvM-9k-mzF"/>
+                            <constraint firstItem="uxL-SW-jpP" firstAttribute="top" secondItem="WkH-1M-pjC" secondAttribute="bottom" constant="10" id="fQH-b4-o2g"/>
                             <constraint firstItem="ziY-Zq-PdQ" firstAttribute="top" secondItem="ePd-3T-yXM" secondAttribute="bottom" id="msY-2G-G7E"/>
                             <constraint firstItem="bwJ-AS-rMY" firstAttribute="top" secondItem="nrj-V8-wCj" secondAttribute="bottom" id="rpP-LT-HHG"/>
                         </constraints>
@@ -112,7 +121,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cL6-di-LQU" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="136.80000000000001" y="124.58770614692655"/>
+            <point key="canvasLocation" x="164" y="-63"/>
         </scene>
     </scenes>
 </document>

@@ -142,7 +142,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     @IBAction func switchCamera(_ sender: AnyObject) {
-        cameraEngine.switchCurrentDevice()
+        _ = cameraEngine.switchCurrentDevice()
     }
     
     @IBAction func takePhoto(_ sender: AnyObject) {
@@ -214,6 +214,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             self.focusView!.removeFromSuperview()
         })
     }
-    
+
+    var croppingEnabled: Bool = false
+    var libraryEnabled: Bool = true
+    @IBAction func openCamera(_ sender: AnyObject) {
+        let cameraViewController = CameraVC(croppingEnabled: croppingEnabled, allowsLibraryAccess: libraryEnabled) { [weak self] image, asset in
+            //self?.imageView.image = image
+            self?.dismiss(animated: true, completion: nil)
+        }
+
+        present(cameraViewController, animated: true, completion: nil)
+    }
 }
 
