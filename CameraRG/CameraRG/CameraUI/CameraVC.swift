@@ -35,7 +35,6 @@ public extension CameraVC {
                 completion(nil, nil)
             }
         }
-        
         return navigationController
     }
 }
@@ -194,14 +193,13 @@ public class CameraVC: UIViewController {
          cameraButton,
          closeButton,
          flashButton,
-         containerSwapLibraryButton].forEach({ self.view.addSubview($0) })
+         containerSwapLibraryButton].forEach({ view.addSubview($0) })
         [swapButton, libraryButton].forEach({ containerSwapLibraryButton.addSubview($0) })
         view.setNeedsUpdateConstraints()
     }
     
     /**
-     * Setup the constraints when the app is starting or rotating
-     * the screen.
+     * Setup the constraints when the app is starting or rotating the screen.
      * To avoid the override/conflict of stable constraint, these
      * stable constraint are one time configurable.
      * Any other dynamic constraint are configurable when the
@@ -267,7 +265,7 @@ public class CameraVC: UIViewController {
         setupVolumeControl()
         setupActions()
         checkPermissions()
-        cameraView.configureFocus()
+        cameraView.configureGesture()
     }
     
     /**
@@ -393,7 +391,7 @@ public class CameraVC: UIViewController {
          * and CATransaction of animation of buttons.
          */
         
-        let time: DispatchTime = DispatchTime.now() + Double(1 * UInt64(NSEC_PER_SEC)/10)
+        let time = DispatchTime.now() + Double(1 * UInt64(NSEC_PER_SEC)/10)
         DispatchQueue.main.asyncAfter(deadline: time) {
             
             CATransaction.begin()
@@ -411,7 +409,6 @@ public class CameraVC: UIViewController {
             }, completion: { _ in
                 self.animationRunning = false
             })
-            
         }
     }
     

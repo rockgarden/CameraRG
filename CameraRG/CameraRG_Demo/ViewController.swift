@@ -32,8 +32,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.cameraEngine.startSession()
-        initFocusView()
+        //self.cameraEngine.startSession()
+        //initFocusView()
     }
     
     func initFocusView() {
@@ -54,7 +54,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
      */
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        insertCameraLayer()
+        //insertCameraLayer()
     }
     
     func insertCameraLayer() {
@@ -65,7 +65,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        self.cameraEngine.rotationCamera = true
+        //self.cameraEngine.rotationCamera = true
     }
     
     @IBAction func setModeCapture(_ sender: AnyObject) {
@@ -105,26 +105,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.present(alertController, animated: true, completion: nil)
     }
     
-    @IBAction func setZoomCamera(_ sender: AnyObject) {
-        let alertController = UIAlertController(title: "set zoom factor", message: nil, preferredStyle: .actionSheet)
-        alertController.addAction(UIAlertAction(title: "X1", style: .default) { _ in
-            self.cameraEngine.cameraZoomFactor = 1
-        })
-        alertController.addAction(UIAlertAction(title: "X2", style: .default) { _ in
-            self.cameraEngine.cameraZoomFactor = 2
-        })
-        alertController.addAction(UIAlertAction(title: "X3", style: .default) { _ in
-            self.cameraEngine.cameraZoomFactor = 3
-        })
-        alertController.addAction(UIAlertAction(title: "X4", style: .default) { _ in
-            self.cameraEngine.cameraZoomFactor = 4
-        })
-        alertController.addAction(UIAlertAction(title: "X5", style: .default) { _ in
-            self.cameraEngine.cameraZoomFactor = 5
-        })
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        self.present(alertController, animated: true, completion: nil)
-    }
+    @IBAction func setZoomCamera(_ sender: AnyObject) { }
     
     @IBAction func setFocus(_ sender: AnyObject) {
         let alertController = UIAlertController(title: "set focus settings", message: nil, preferredStyle: .actionSheet)

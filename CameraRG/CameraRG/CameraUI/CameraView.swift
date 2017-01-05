@@ -40,28 +40,64 @@ public class CameraView: UIView {
         cameraLayer.frame = bounds
         self.layer.insertSublayer(cameraLayer, at: 0)
     }
-
-    public func configureFocus() {
+    
+    public func configureGesture() {
         if let gestureRecognizers = gestureRecognizers {
             gestureRecognizers.forEach({ removeGestureRecognizer($0) })
         }
+        let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(zoom(_:)))
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(focus(_:)))
         self.addGestureRecognizer(tapGesture)
+        self.addGestureRecognizer(pinchGesture)
         isUserInteractionEnabled = true
         let lines = focusView.horizontalLines + focusView.verticalLines + focusView.outerLines
         lines.forEach { line in
             line.alpha = 0
         }
     }
+    
+    var originScaleFactor: CGFloat!
+    internal func zoom(_ sender: UIPinchGestureRecognizer) {
+        let gain: CGFloat = 1
+        let minScaleFactor: CGFloat = 1, maxScaleFactor: CGFloat = 10
+        switch sender.state {
+        case .possible, .failed:
+            return
+        case .began:
+            debugPrint("began",sender.scale)
+            originScaleFactor = cameraEngine.cameraZoomFactor!
+            break
+        case .changed:
+            debugPrint("changed",sender.scale)
+            if (sender.scale > 1) {
+                // increase zoom
+                if (originScaleFactor <= maxScaleFactor) { cameraEngine.cameraZoomFactor = originScaleFactor * sender.scale * gain }
+            } else {
+                // decrease zoom
+                if (originScaleFactor > minScaleFactor) { cameraEngine.cameraZoomFactor = originScaleFactor * sender.scale * gain}
+            }
+            break
+        case .ended:
+            debugPrint("ended",sender.scale)
+            if (cameraEngine.cameraZoomFactor > 10) {
+                cameraEngine.cameraZoomFactor = 10
+            }
+            if (cameraEngine.cameraZoomFactor < 1) {
+                cameraEngine.cameraZoomFactor = 1
+            }
+            break
+        default: break
+        }
+    }
 
-    internal func focus(_ gesture: UITapGestureRecognizer) {
-        let point = gesture.location(in: self)
+    internal func focus(_ sender: UITapGestureRecognizer) {
+        let point = sender.location(in: self)
         let viewsize = self.bounds.size
         let newPoint = CGPoint(x: point.y/viewsize.height, y: 1.0-point.x/viewsize.width)
         guard cameraEngine.focus(newPoint) else { return }
         focusView.alpha = 0.0
         focusView.center = point
-        self.addSubview(focusView) //bringSubview(toFront: focusView)
+        addSubview(focusView) //bringSubview(toFront: focusView)
         focusView.focusAnimate()
     }
 
