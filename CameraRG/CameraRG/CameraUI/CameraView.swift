@@ -59,33 +59,29 @@ public class CameraView: UIView {
     var originScaleFactor: CGFloat!
     internal func zoom(_ sender: UIPinchGestureRecognizer) {
         let gain: CGFloat = 1
-        let minScaleFactor: CGFloat = 1, maxScaleFactor: CGFloat = 10
+        let minScaleFactor: CGFloat = 1, maxScaleFactor: CGFloat = 6
         switch sender.state {
-        case .possible, .failed:
-            return
         case .began:
-            debugPrint("began",sender.scale)
+            //debugPrint(".began",sender.scale)
             originScaleFactor = cameraEngine.cameraZoomFactor!
-            break
         case .changed:
-            debugPrint("changed",sender.scale)
+            //debugPrint(".changed",sender.scale)
+            if cameraEngine.cameraZoomFactor > maxScaleFactor {break}
+            if cameraEngine.cameraZoomFactor < minScaleFactor {break}
             if (sender.scale > 1) {
-                // increase zoom
-                if (originScaleFactor <= maxScaleFactor) { cameraEngine.cameraZoomFactor = originScaleFactor * sender.scale * gain }
+                /// increase zoom
+                cameraEngine.cameraZoomFactor = originScaleFactor * sender.scale * gain
             } else {
-                // decrease zoom
-                if (originScaleFactor > minScaleFactor) { cameraEngine.cameraZoomFactor = originScaleFactor * sender.scale * gain}
+                /// decrease zoom
+                cameraEngine.cameraZoomFactor = originScaleFactor * sender.scale * gain
             }
-            break
         case .ended:
-            debugPrint("ended",sender.scale)
-            if (cameraEngine.cameraZoomFactor > 10) {
-                cameraEngine.cameraZoomFactor = 10
+            if (cameraEngine.cameraZoomFactor > maxScaleFactor) {
+                cameraEngine.cameraZoomFactor = maxScaleFactor
             }
-            if (cameraEngine.cameraZoomFactor < 1) {
-                cameraEngine.cameraZoomFactor = 1
+            if (cameraEngine.cameraZoomFactor < minScaleFactor) {
+                cameraEngine.cameraZoomFactor = minScaleFactor
             }
-            break
         default: break
         }
     }

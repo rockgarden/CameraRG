@@ -62,6 +62,7 @@
 		C2998B201E1CE38500ACE5C1 /* ConfirmViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C2998B1E1E1CE38500ACE5C1 /* ConfirmViewController.xib */; };
 		C2998B231E1CE3A800ACE5C1 /* ImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2998B211E1CE3A800ACE5C1 /* ImageCell.swift */; };
 		C2998B241E1CE3A800ACE5C1 /* PermissionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2998B221E1CE3A800ACE5C1 /* PermissionsView.swift */; };
+		C2ACE6F21E1F6FBE009346AF /* SqueezeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2ACE6F11E1F6FBE009346AF /* SqueezeButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -141,6 +142,7 @@
 		C2998B1E1E1CE38500ACE5C1 /* ConfirmViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConfirmViewController.xib; sourceTree = "<group>"; };
 		C2998B211E1CE3A800ACE5C1 /* ImageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCell.swift; sourceTree = "<group>"; };
 		C2998B221E1CE3A800ACE5C1 /* PermissionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PermissionsView.swift; sourceTree = "<group>"; };
+		C2ACE6F11E1F6FBE009346AF /* SqueezeButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SqueezeButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -251,6 +253,7 @@
 				C2998B0E1E1CE1DA00ACE5C1 /* UIButtonExtensions.swift */,
 				C2998B0F1E1CE1DA00ACE5C1 /* UIViewExtensions.swift */,
 				C2998B1B1E1CE37000ACE5C1 /* PhotoLibraryViewController.swift */,
+				C2ACE6F11E1F6FBE009346AF /* SqueezeButton.swift */,
 				C2998B101E1CE1DA00ACE5C1 /* Utilities.swift */,
 			);
 			path = CameraUI;
@@ -428,6 +431,7 @@
 				C2998B161E1CE1DA00ACE5C1 /* SingleImageSaver.swift in Sources */,
 				C2998AFE1E1CB49700ACE5C1 /* FocusView.swift in Sources */,
 				C20BFC951E1CA20200C6E6DA /* CameraEngine9.swift in Sources */,
+				C2ACE6F21E1F6FBE009346AF /* SqueezeButton.swift in Sources */,
 				C2998B011E1CBF1600ACE5C1 /* CameraView.swift in Sources */,
 				C2998B081E1CDEAF00ACE5C1 /* CameraGlobals.swift in Sources */,
 				C20BFC991E1CA20200C6E6DA /* CameraEngineCaptureOutput10.swift in Sources */,

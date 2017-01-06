@@ -77,6 +77,9 @@ public class CameraVC: UIViewController {
     var flashButtonEdgeConstraint: NSLayoutConstraint?
     var flashButtonGravityConstraint: NSLayoutConstraint?
     
+    var zoomButtonEdgeConstraint: NSLayoutConstraint?
+    var zoomButtonGravityConstraint: NSLayoutConstraint?
+    
     var cameraOverlayEdgeOneConstraint: NSLayoutConstraint?
     var cameraOverlayEdgeTwoConstraint: NSLayoutConstraint?
     var cameraOverlayWidthConstraint: NSLayoutConstraint?
@@ -149,6 +152,18 @@ public class CameraVC: UIViewController {
         return button
     }()
     
+    let zoomButton : UIButton = {
+        let button = SqueezeButton(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setBackgroundImage(UIImage(named: "flashOffIcon",
+                                in: Bundle(for: CameraVC.self),
+                                compatibleWith: nil),
+                        for: .normal)
+        button.setTitle("x1", for: .normal)
+        button.setTitleColor(.yellow, for: .normal)
+        return button
+    }()
+    
     let containerSwapLibraryButton : UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -193,6 +208,7 @@ public class CameraVC: UIViewController {
          cameraButton,
          closeButton,
          flashButton,
+         zoomButton,
          containerSwapLibraryButton].forEach({ view.addSubview($0) })
         [swapButton, libraryButton].forEach({ containerSwapLibraryButton.addSubview($0) })
         view.setNeedsUpdateConstraints()
@@ -237,6 +253,9 @@ public class CameraVC: UIViewController {
         configFlashEdgeButtonConstraint(statusBarOrientation)
         configFlashGravityButtonConstraint(statusBarOrientation)
         
+        configZoomEdgeButtonConstraint(statusBarOrientation)
+        configZoomGravityButtonConstraint(statusBarOrientation)
+        
         let padding : CGFloat = portrait ? 16.0 : -16.0
         removeCameraOverlayEdgesConstraints()
         configCameraOverlayEdgeOneContraint(portrait, padding: padding)
@@ -262,9 +281,10 @@ public class CameraVC: UIViewController {
         super.viewDidLoad()
         addCameraObserver()
         addRotateObserver()
+        addCameraZoomObserver()
         setupVolumeControl()
         setupActions()
-        checkPermissions()
+        //checkPermissions()
         cameraView.configureGesture()
     }
     
@@ -329,6 +349,23 @@ public class CameraVC: UIViewController {
 //            object: nil)
     }
     
+    /**
+     * Observer the camera zoom factor, when it is changed,
+     * it set the zoomButton title to equal new cameraZoomFactor.
+     */
+    private func addCameraZoomObserver() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(notifyCameraZoom),
+            name: NSNotification.Name(rawValue: "videoZoomFactor"),
+            object: nil)
+    }
+    
+    internal func notifyCameraZoom(_ n: Notification) {
+        guard let z = n.object else {return}
+        self.zoomButton.setTitle("×\(String(describing: z))", for: .normal)
+    }
+    
     internal func notifyCameraReady() {
         cameraButton.isEnabled = true
     }
@@ -354,6 +391,7 @@ public class CameraVC: UIViewController {
         libraryButton.action = { [weak self] in self?.showLibrary() }
         closeButton.action = { [weak self] in self?.close() }
         flashButton.action = { [weak self] in self?.toggleFlash() }
+        zoomButton.action = { [weak self] in self?.zoomOne() }
     }
     
     /**
@@ -413,10 +451,11 @@ public class CameraVC: UIViewController {
     }
     
     func setTransform(transform: CGAffineTransform) {
-        self.closeButton.transform = transform
-        self.swapButton.transform = transform
-        self.libraryButton.transform = transform
-        self.flashButton.transform = transform
+        closeButton.transform = transform
+        swapButton.transform = transform
+        libraryButton.transform = transform
+        flashButton.transform = transform
+        zoomButton.transform = transform
     }
     
     /**
@@ -546,6 +585,11 @@ public class CameraVC: UIViewController {
         flashButton.setImage(image, for: .normal)
     }
     
+    internal func zoomOne() {
+        cameraView.cameraEngine.cameraZoomFactor = 1.0
+        zoomButton.setTitle("x1", for: .normal)
+    }
+    
     internal func swapCamera() {
         let isBack = cameraView.cameraEngine.switchCurrentDevice()
         if isBack { flashButton.isHidden = false } else {flashButton.isHidden = true}
@@ -566,7 +610,7 @@ public class CameraVC: UIViewController {
                 self.dismiss(animated: true, completion: nil)
             }
         }
-        confirmViewController.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+        confirmViewController.modalTransitionStyle = .crossDissolve
         present(confirmViewController, animated: true, completion: nil)
     }
     
@@ -585,7 +629,7 @@ public class CameraVC: UIViewController {
  * This extension provides the configuration of
  * constraints for CameraViewController.
  */
-extension CameraVC {
+internal extension CameraVC {
     
     /**
      * To attach the view to the edges of the superview, it needs
@@ -667,8 +711,7 @@ extension CameraVC {
     
     /**
      * Configure the edges constraints of container that
-     * handle the center position of SwapButton and
-     * LibraryButton.
+     * handle the center position of SwapButton and LibraryButton.
      */
     func configContainerEdgeConstraint(_ statusBarOrientation : UIInterfaceOrientation) {
         
@@ -820,7 +863,7 @@ extension CameraVC {
      * Pin the close button to the left of the superview.
      */
     func configCloseButtonEdgeConstraint(_ statusBarOrientation : UIInterfaceOrientation) {
-        
+
         let attribute : NSLayoutAttribute = {
             switch statusBarOrientation {
             case .portrait: return .left
@@ -1008,6 +1051,52 @@ extension CameraVC {
             multiplier: 1.0,
             constant: constraintRight ? -8 : 8)
         view.addConstraint(flashButtonGravityConstraint!)
+    }
+    
+    /**
+     * If the device orientation is portrait, pin the top of
+     * zoomButton to the top side of superview.
+     * Else if, pin the zoomButton bottom side on the top side
+     * of SwapButton.
+     */
+    func configZoomEdgeButtonConstraint(_ statusBarOrientation: UIInterfaceOrientation) {
+        view.autoRemoveConstraint(zoomButtonEdgeConstraint)
+        
+        let constraintLeft = statusBarOrientation == .portrait || statusBarOrientation == .landscapeRight
+        let attribute : NSLayoutAttribute = constraintLeft ? .top : .bottom
+        
+        zoomButtonEdgeConstraint = NSLayoutConstraint(
+            item: zoomButton,
+            attribute: attribute,
+            relatedBy: .equal,
+            toItem: view,
+            attribute: attribute,
+            multiplier: 1.0,
+            constant: constraintLeft ? 8 : -8)
+        view.addConstraint(zoomButtonEdgeConstraint!)
+    }
+    
+    /**
+     * If the device orientation is portrait, pin the
+     left side of zoomButton to the left side of superview.
+     * Else if, centerX the zoomButton on the CenterX
+     * of CameraButton.
+     */
+    func configZoomGravityButtonConstraint(_ statusBarOrientation: UIInterfaceOrientation) {
+        view.autoRemoveConstraint(zoomButtonGravityConstraint)
+        
+        let constraintLeft = statusBarOrientation == .portrait || statusBarOrientation == .landscapeLeft
+        let attribute : NSLayoutAttribute = constraintLeft ? .left : .right
+        
+        zoomButtonGravityConstraint = NSLayoutConstraint(
+            item: zoomButton,
+            attribute: attribute,
+            relatedBy: .equal,
+            toItem: view,
+            attribute: attribute,
+            multiplier: 1.0,
+            constant: constraintLeft ? 8 : -8)
+        view.addConstraint(zoomButtonGravityConstraint!)
     }
     
     /**

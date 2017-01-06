@@ -71,8 +71,10 @@ class CameraEngineDevice {
                 zoom = max(1.0, min(newFactor, currentDevice.activeFormat.videoMaxZoomFactor))
                 currentDevice.videoZoomFactor = zoom
                 currentDevice.unlockForConfiguration()
-            }
-            catch {
+                let z = floor(zoom)
+                NotificationCenter.default
+                    .post(name: Notification.Name(rawValue: "videoZoomFactor"), object: z)
+            } catch {
                 zoom = -1.0
                 fatalError("[CameraEngine] error, impossible to lock configuration device")
             }
