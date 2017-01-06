@@ -71,7 +71,7 @@ class CameraEngineDevice {
                 zoom = max(1.0, min(newFactor, currentDevice.activeFormat.videoMaxZoomFactor))
                 currentDevice.videoZoomFactor = zoom
                 currentDevice.unlockForConfiguration()
-                let z = floor(zoom)
+                let z = floor(zoom*10)/10
                 NotificationCenter.default
                     .post(name: Notification.Name(rawValue: "videoZoomFactor"), object: z)
             } catch {

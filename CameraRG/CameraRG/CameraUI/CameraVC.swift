@@ -42,6 +42,8 @@ public extension CameraVC {
 
 public typealias CameraCompletion = (UIImage?, PHAsset?) -> Void
 
+fileprivate let x1 = NSAttributedString(string: "x1", attributes: normalTitleAttributes)
+
 public class CameraVC: UIViewController {
     
     var didUpdateViews = false
@@ -155,12 +157,10 @@ public class CameraVC: UIViewController {
     let zoomButton : UIButton = {
         let button = SqueezeButton(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setBackgroundImage(UIImage(named: "flashOffIcon",
-                                in: Bundle(for: CameraVC.self),
-                                compatibleWith: nil),
-                        for: .normal)
-        button.setTitle("x1", for: .normal)
-        button.setTitleColor(.yellow, for: .normal)
+        let normalAttributedTitle = NSAttributedString(string: "x1", attributes: normalTitleAttributes)
+        button.setAttributedTitle(x1, for: UIControlState())
+        button.setBackgroundImage(EllipseShape, for: UIControlState())
+        button.backgroundColor = .clear
         return button
     }()
     
@@ -363,7 +363,8 @@ public class CameraVC: UIViewController {
     
     internal func notifyCameraZoom(_ n: Notification) {
         guard let z = n.object else {return}
-        self.zoomButton.setTitle("×\(String(describing: z))", for: .normal)
+        let t = NSAttributedString(string: "x\(String(describing: z))", attributes: normalTitleAttributes)
+        zoomButton.setAttributedTitle(t, for: UIControlState())
     }
     
     internal func notifyCameraReady() {
@@ -587,7 +588,7 @@ public class CameraVC: UIViewController {
     
     internal func zoomOne() {
         cameraView.cameraEngine.cameraZoomFactor = 1.0
-        zoomButton.setTitle("x1", for: .normal)
+        zoomButton.setAttributedTitle(x1, for: UIControlState())
     }
     
     internal func swapCamera() {
